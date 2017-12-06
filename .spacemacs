@@ -1,6 +1,10 @@
+;; -*- mode: emacs-lisp -*-
+;; This file is loaded by Spacemacs at startup.
+;; It must be stored in your home directory.
 (defvar rezo-const-full-date "%Y/%m/%d" "完整日期格式")
 (defvar rezo-const-full-datetime "%Y/%m/%d %H:%M" "完整日期时间格式")
 (defvar rezo-const-short-date "%m.%d" "时间格式")
+
 ;; 用户信息: 注意FreeBSD无法通过getenv获取到当前用户名
 (defvar rezo-name-user "rezo" "用户名")
 (defvar rezo-name-full "Rezo.Chiang" "用户全名")
@@ -8,248 +12,413 @@
 
 (defvar rezo-dir-home (getenv "HOME") "定义用户根目录" )
 (defvar rezo-dir-default (expand-file-name "file" rezo-dir-home) "各项目文件存放根路径" )
-(defvar rezo-gdt-dir (expand-file-name "proj_gdt" rezo-dir-default) "gdt根目录" )
-(defvar rezo-dir-snippet (expand-file-name "proj_rezo_snippets" rezo-dir-default)  "yassnippets文件根目录" )
-(defvar rezo-dir-remember (expand-file-name "proj_rezo_remember" rezo-dir-default) "remember文件目录" )
+(defvar rezo-gtd-dir (expand-file-name "proj_gtd" rezo-dir-default) "gdt根目录" )
 
-(defvar rezo-gdt-code (expand-file-name "code.org" rezo-gdt-dir) "代码或技术备注文件存放路径" )
-(defvar rezo-gdt-idea (expand-file-name "idea.org" rezo-gdt-dir) "GDT初步设想记录文件存放路径" )
-(defvar rezo-gdt-note (expand-file-name "note.org" rezo-gdt-dir) "GDT笔记文件存放路径" )
-(defvar rezo-gdt-other (expand-file-name "inbox.org" rezo-gdt-dir) "GDT杂项文件存放路径" )
-(defvar rezo-gdt-project (expand-file-name "project.org" rezo-gdt-dir) "GDT项目或计划存放路径" )
-(defvar rezo-gdt-question (expand-file-name "question.org" rezo-gdt-dir) "GDT问题记录文件存放路径" )
-(defvar rezo-gtd-review (expand-file-name "review.org" rezo-gdt-dir) "GDT回溯反思文件存放路径" )
-(defvar rezo-gdt-task (expand-file-name "task.org" rezo-gdt-dir) "GDT任务文件存放路径" )
+(defvar rezo-gtd-dict (expand-file-name "dictionary.org" rezo-gtd-dir) "术语词汇文件路径" )
+(defvar rezo-gtd-inbox (expand-file-name "inbox.org" rezo-gtd-dir) "GDT杂项文件存放路径" )
+(defvar rezo-gtd-leagcy (expand-file-name "leagcy.org" rezo-gtd-dir) "GDT上一版文件汇总" )
 
-
-;; 定义编码
 (defvar rezo-coding-default 'utf-8 "默认编码设置")
 
-;; (setq debug-on-error t)
+(defun rezo-org-capture-tpl-term()
+  (concat "* " (format-time-string "%Y-%m-%d" (current-time)) " %?")
+  )
 
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-(display-time-mode 1)
+(defun rezo-org-capture-tpl-note()
+  (concat "** [" (format-time-string "%H:%M" (current-time)) "] %^{keywords, cause or purpose}\t%^g\n%?")
+  )
 
-;; 设置编码
-(set-language-environment rezo-coding-default)
-(set-keyboard-coding-system rezo-coding-default)
-(set-clipboard-coding-system rezo-coding-default)
-(set-terminal-coding-system rezo-coding-default)
-(set-buffer-file-coding-system rezo-coding-default)
-(set-selection-coding-system rezo-coding-default)
-
-(setq-default
- pathname-coding-system rezo-coding-default
-
- ;; dotspacemacs-themes '(spacemacs-light)
- dotspacemacs-themes '(molokai)
-
- display-time-interval 10
-
- dotspacemacs-default-font '("DejaVu Sans Mono"
-                             :size 9.2
-                             :weight normal
-                             :width normal
-                             :powerline-scale 1.2)
-
- org-log-done 'time
- org-log-done 'note
-
- dotspacemacs-check-for-update nil
+(defun rezo-org-capture-tpl-plain()
+  (concat "** [" (format-time-string "%H:%M" (current-time)) "] %?\t:未归类:")
+  )
 
 
- dotspacemacs-configuration-layers '( auto-completion
-                                      command-log
-                                      shell
-                                      org
-                                      react
-                                      c-c++
-                                      shell-scripts
-                                      sql
-                                      markdown
-                                      ruby
-                                      javascript
-                                      lua
-                                      php
-                                      html
-                                      git
+(setq debug-on-error t)
+
+(defun dotspacemacs/layers ()
+  "Configuration Layers declaration.
+You should not put any user code in this function besides modifying the variable
+values."
+  (setq-default
+   ;; pathname-coding-system rezo-coding-default
+   line-spacing 3
+   display-time-interval 10
+   org-log-done 'time
+   org-log-done 'note
+   make-backup-files nil
+
+   ;; Base distribution to use. This is a layer contained in the directory
+   ;; `+distribution'. For now available distributions are `spacemacs-base'
+   ;; or `spacemacs'. (default 'spacemacs)
+   dotspacemacs-distribution 'spacemacs
+   ;; Lazy installation of layers (i.e. layers are installed only when a file
+   ;; with a supported type is opened). Possible values are `all', `unused'
+   ;; and `nil'. `unused' will lazy install only unused layers (i.e. layers
+   ;; not listed in variable `dotspacemacs-configuration-layers'), `all' will
+   ;; lazy install any layer that support lazy installation even the layers
+   ;; listed in `dotspacemacs-configuration-layers'. `nil' disable the lazy
+   ;; installation feature and you have to explicitly list a layer in the
+   ;; variable `dotspacemacs-configuration-layers' to install it.
+   ;; (default 'unused)
+   dotspacemacs-enable-lazy-installation 'unused
+   ;; If non-nil then Spacemacs will ask for confirmation before installing
+   ;; a layer lazily. (default t)
+   dotspacemacs-ask-for-lazy-installation t
+   ;; If non-nil layers with lazy install support are lazy installed.
+   ;; List of additional paths where to look for configuration layers.
+   ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
+   dotspacemacs-configuration-layer-path '()
+   ;; List of configuration layers to load.
+   dotspacemacs-configuration-layers
+   '(
+     ;; ----------------------------------------------------------------
+     ;; Example of useful layers you may want to use right away.
+     ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
+     ;; <M-m f e R> (Emacs style) to install them.
+     ;; ----------------------------------------------------------------
+     helm
+     auto-completion
+     ;; better-defaults
+     emacs-lisp
+     git
+     markdown
+     org
+     ;; (shell :variables
+     ;;        shell-default-height 30
+     ;;        shell-default-position 'bottom)
+     ;; spell-checking
+     ;; syntax-checking
+     ;; version-control
+     command-log
+     shell
+     react
+     c-c++
+     shell-scripts
+     sql
+     ruby
+     javascript
+     lua
+     php
+     html
+     )
+   ;; List of additional packages that will be installed without being
+   ;; wrapped in a layer. If you need some configuration for these
+   ;; packages, then consider creating a layer. You can also put the
+   ;; configuration in `dotspacemacs/user-config'.
+   dotspacemacs-additional-packages '(molokai-theme
+                                      zen-and-art-theme
+                                      tangotango-theme
+                                      espresso-theme
+                                      twilight-bright-theme
+                                      org-projectile
+                                      lua-mode
+                                      ;; js2-mode
+                                      ;; js3-mode
+                                      web-mode
+                                      yasnippet
+                                      origami
+                                      keyfreq
+                                      tiny
+                                      swiper
+                                      wgrep
+                                      iedit
+                                      rainbow-mode
+                                      git-timemachine
                                       )
+   ;; A list of packages that cannot be updated.
+   dotspacemacs-frozen-packages '()
+   ;; A list of packages that will not be installed and loaded.
+   dotspacemacs-excluded-packages '()
+   ;; Defines the behaviour of Spacemacs when installing packages.
+   ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
+   ;; `used-only' installs only explicitly used packages and uninstall any
+   ;; unused packages as well as their unused dependencies.
+   ;; `used-but-keep-unused' installs only the used packages but won't uninstall
+   ;; them if they become unused. `all' installs *all* packages supported by
+   ;; Spacemacs and never uninstall them. (default is `used-only')
+   dotspacemacs-install-packages 'used-only))
 
- dotspacemacs-additional-packages '( molokai-theme
-                                     zen-and-art-theme
-                                     tangotango-theme
-                                     espresso-theme
-                                     twilight-bright-theme
-                                     lua-mode
-                                     js2-mode
-                                     web-mode
-                                     yasnippet
-                                     origami
-                                     swiper
-                                     rainbow-mode
-                                     git-timemachine
-                                     company
-                                     ;; multiple-cursor-mode
-                                     )
- ;; A list of packages that cannot be updated.
- dotspacemacs-frozen-packages '()
- ;; A list of packages that will not be installed and loaded.
- dotspacemacs-excluded-packages '()
- )
-;; 使用avy-goto-char切换窗口(替换掉ace-window)
-(global-set-key (kbd "C-x j") 'avy-goto-char)
+(defun dotspacemacs/init ()
+  "Initialization function.
+This function is called at the very startup of Spacemacs initialization
+before layers configuration.
+You should not put any user code in there besides modifying the variable
+values."
+  ;; This setq-default sexp is an exhaustive list of all the supported
+  ;; spacemacs settings.
+  (setq-default
+   ;; If non nil ELPA repositories are contacted via HTTPS whenever it's
+   ;; possible. Set it to nil if you have no way to use HTTPS in your
+   ;; environment, otherwise it is strongly recommended to let it set to t.
+   ;; This variable has no effect if Emacs is launched with the parameter
+   ;; `--insecure' which forces the value of this variable to nil.
+   ;; (default t)
+   dotspacemacs-elpa-https t
+   ;; Maximum allowed time in seconds to contact an ELPA repository.
+   dotspacemacs-elpa-timeout 5
+   ;; If non nil then spacemacs will check for updates at startup
+   ;; when the current branch is not `develop'. Note that checking for
+   ;; new versions works via git commands, thus it calls GitHub services
+   ;; whenever you start Emacs. (default nil)
+   dotspacemacs-check-for-update nil
+   ;; If non-nil, a form that evaluates to a package directory. For example, to
+   ;; use different package directories for different Emacs versions, set this
+   ;; to `emacs-version'.
+   dotspacemacs-elpa-subdirectory nil
+   ;; One of `vim', `emacs' or `hybrid'.
+   ;; `hybrid' is like `vim' except that `insert state' is replaced by the
+   ;; `hybrid state' with `emacs' key bindings. The value can also be a list
+   ;; with `:variables' keyword (similar to layers). Check the editing styles
+   ;; section of the documentation for details on available variables.
+   ;; (default 'vim)
+   dotspacemacs-editing-style 'vim
+   ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
+   dotspacemacs-verbose-loading nil
+   ;; Specify the startup banner. Default value is `official', it displays
+   ;; the official spacemacs logo. An integer value is the index of text
+   ;; banner, `random' chooses a random text banner in `core/banners'
+   ;; directory. A string value must be a path to an image format supported
+   ;; by your Emacs build.
+   ;; If the value is nil then no banner is displayed. (default 'official)
+   dotspacemacs-startup-banner 'official
+   ;; List of items to show in startup buffer or an association list of
+   ;; the form `(list-type . list-size)`. If nil then it is disabled.
+   ;; Possible values for list-type are:
+   ;; `recents' `bookmarks' `projects' `agenda' `todos'."
+   ;; List sizes may be nil, in which case
+   ;; `spacemacs-buffer-startup-lists-length' takes effect.
+   dotspacemacs-startup-lists '((recents . 5)
+                                (projects . 7))
+   ;; True if the home buffer should respond to resize events.
+   dotspacemacs-startup-buffer-responsive t
+   ;; Default major mode of the scratch buffer (default `text-mode')
+   dotspacemacs-scratch-mode 'text-mode
+   ;; List of themes, the first of the list is loaded when spacemacs starts.
+   ;; Press <SPC> T n to cycle to the next theme in the list (works great
+   ;; with 2 themes variants, one dark and one light)
+   dotspacemacs-themes '(molokai
+                         spacemacs-dark
+                         spacemacs-light)
+   ;; If non nil the cursor color matches the state color in GUI Emacs.
+   dotspacemacs-colorize-cursor-according-to-state t
+   ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
+   ;; quickly tweak the mode-line size to make separators look not too crappy.
+   dotspacemacs-default-font '("DejaVu Sans Mono"
+                               :size 9.2
+                               :weight normal
+                               :width normal
+                               :powerline-scale 1.2)
+   ;; The leader key
+   dotspacemacs-leader-key "SPC"
+   ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
+   ;; (default "SPC")
+   dotspacemacs-emacs-command-key "SPC"
+   ;; The key used for Vim Ex commands (default ":")
+   dotspacemacs-ex-command-key ":"
+   ;; The leader key accessible in `emacs state' and `insert state'
+   ;; (default "M-m")
+   dotspacemacs-emacs-leader-key "M-m"
+   ;; Major mode leader key is a shortcut key which is the equivalent of
+   ;; pressing `<leader> m`. Set it to `nil` to disable it. (default ",")
+   dotspacemacs-major-mode-leader-key ","
+   ;; Major mode leader key accessible in `emacs state' and `insert state'.
+   ;; (default "C-M-m")
+   dotspacemacs-major-mode-emacs-leader-key "C-M-m"
+   ;; These variables control whether separate commands are bound in the GUI to
+   ;; the key pairs C-i, TAB and C-m, RET.
+   ;; Setting it to a non-nil value, allows for separate commands under <C-i>
+   ;; and TAB or <C-m> and RET.
+   ;; In the terminal, these pairs are generally indistinguishable, so this only
+   ;; works in the GUI. (default nil)
+   dotspacemacs-distinguish-gui-tab nil
+   ;; If non nil `Y' is remapped to `y$' in Evil states. (default nil)
+   dotspacemacs-remap-Y-to-y$ nil
+   ;; If non-nil, the shift mappings `<' and `>' retain visual state if used
+   ;; there. (default t)
+   dotspacemacs-retain-visual-state-on-shift t
+   ;; If non-nil, J and K move lines up and down when in visual mode.
+   ;; (default nil)
+   dotspacemacs-visual-line-move-text nil
+   ;; If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.
+   ;; (default nil)
+   dotspacemacs-ex-substitute-global nil
+   ;; Name of the default layout (default "Default")
+   dotspacemacs-default-layout-name "Default"
+   ;; If non nil the default layout name is displayed in the mode-line.
+   ;; (default nil)
+   dotspacemacs-display-default-layout nil
+   ;; If non nil then the last auto saved layouts are resume automatically upon
+   ;; start. (default nil)
+   dotspacemacs-auto-resume-layouts nil
+   ;; Size (in MB) above which spacemacs will prompt to open the large file
+   ;; literally to avoid performance issues. Opening a file literally means that
+   ;; no major mode or minor modes are active. (default is 1)
+   dotspacemacs-large-file-size 1
+   ;; Location where to auto-save files. Possible values are `original' to
+   ;; auto-save the file in-place, `cache' to auto-save the file to another
+   ;; file stored in the cache directory and `nil' to disable auto-saving.
+   ;; (default 'cache)
+   dotspacemacs-auto-save-file-location 'cache
+   ;; Maximum number of rollback slots to keep in the cache. (default 5)
+   dotspacemacs-max-rollback-slots 5
+   ;; If non nil, `helm' will try to minimize the space it uses. (default nil)
+   dotspacemacs-helm-resize nil
+   ;; if non nil, the helm header is hidden when there is only one source.
+   ;; (default nil)
+   dotspacemacs-helm-no-header nil
+   ;; define the position to display `helm', options are `bottom', `top',
+   ;; `left', or `right'. (default 'bottom)
+   dotspacemacs-helm-position 'bottom
+   ;; Controls fuzzy matching in helm. If set to `always', force fuzzy matching
+   ;; in all non-asynchronous sources. If set to `source', preserve individual
+   ;; source settings. Else, disable fuzzy matching in all sources.
+   ;; (default 'always)
+   dotspacemacs-helm-use-fuzzy 'always
+   ;; If non nil the paste micro-state is enabled. When enabled pressing `p`
+   ;; several times cycle between the kill ring content. (default nil)
+   dotspacemacs-enable-paste-transient-state nil
+   ;; Which-key delay in seconds. The which-key buffer is the popup listing
+   ;; the commands bound to the current keystroke sequence. (default 0.4)
+   dotspacemacs-which-key-delay 0.4
+   ;; Which-key frame position. Possible values are `right', `bottom' and
+   ;; `right-then-bottom'. right-then-bottom tries to display the frame to the
+   ;; right; if there is insufficient space it displays it at the bottom.
+   ;; (default 'bottom)
+   dotspacemacs-which-key-position 'bottom
+   ;; If non nil a progress bar is displayed when spacemacs is loading. This
+   ;; may increase the boot time on some systems and emacs builds, set it to
+   ;; nil to boost the loading time. (default t)
+   dotspacemacs-loading-progress-bar t
+   ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
+   ;; (Emacs 24.4+ only)
+   dotspacemacs-fullscreen-at-startup nil
+   ;; If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
+   ;; Use to disable fullscreen animations in OSX. (default nil)
+   dotspacemacs-fullscreen-use-non-native nil
+   ;; If non nil the frame is maximized when Emacs starts up.
+   ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
+   ;; (default nil) (Emacs 24.4+ only)
+   dotspacemacs-maximized-at-startup nil
+   ;; A value from the range (0..100), in increasing opacity, which describes
+   ;; the transparency level of a frame when it's active or selected.
+   ;; Transparency can be toggled through `toggle-transparency'. (default 90)
+   dotspacemacs-active-transparency 90
+   ;; A value from the range (0..100), in increasing opacity, which describes
+   ;; the transparency level of a frame when it's inactive or deselected.
+   ;; Transparency can be toggled through `toggle-transparency'. (default 90)
+   dotspacemacs-inactive-transparency 90
+   ;; If non nil show the titles of transient states. (default t)
+   dotspacemacs-show-transient-state-title t
+   ;; If non nil show the color guide hint for transient state keys. (default t)
+   dotspacemacs-show-transient-state-color-guide t
+   ;; If non nil unicode symbols are displayed in the mode line. (default t)
+   dotspacemacs-mode-line-unicode-symbols t
+   ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
+   ;; scrolling overrides the default behavior of Emacs which recenters point
+   ;; when it reaches the top or bottom of the screen. (default t)
+   dotspacemacs-smooth-scrolling t
+   ;; Control line numbers activation.
+   ;; If set to `t' or `relative' line numbers are turned on in all `prog-mode' and
+   ;; `text-mode' derivatives. If set to `relative', line numbers are relative.
+   ;; This variable can also be set to a property list for finer control:
+   ;; '(:relative nil
+   ;;   :disabled-for-modes dired-mode
+   ;;                       doc-view-mode
+   ;;                       markdown-mode
+   ;;                       org-mode
+   ;;                       pdf-view-mode
+   ;;                       text-mode
+   ;;   :size-limit-kb 1000)
+   ;; (default nil)
+   dotspacemacs-line-numbers nil
+   ;; Code folding method. Possible values are `evil' and `origami'.
+   ;; (default 'evil)
+   dotspacemacs-folding-method 'evil
+   ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
+   ;; (default nil)
+   dotspacemacs-smartparens-strict-mode nil
+   ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
+   ;; over any automatically added closing parenthesis, bracket, quote, etc…
+   ;; This can be temporary disabled by pressing `C-q' before `)'. (default nil)
+   dotspacemacs-smart-closing-parenthesis nil
+   ;; Select a scope to highlight delimiters. Possible values are `any',
+   ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
+   ;; emphasis the current one). (default 'all)
+   dotspacemacs-highlight-delimiters 'all
+   ;; If non nil, advise quit functions to keep server open when quitting.
+   ;; (default nil)
+   dotspacemacs-persistent-server nil
+   ;; List of search tool executable names. Spacemacs uses the first installed
+   ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
+   ;; (default '("ag" "pt" "ack" "grep"))
+   dotspacemacs-search-tools '("ag" "pt" "ack" "grep")
+   ;; The default package repository used if no explicit repository has been
+   ;; specified with an installed package.
+   ;; Not used for now. (default nil)
+   dotspacemacs-default-package-repository nil
+   ;; Delete whitespace while saving buffer. Possible values are `all'
+   ;; to aggressively delete empty line and long sequences of whitespace,
+   ;; `trailing' to delete only the whitespace at end of lines, `changed'to
+   ;; delete only whitespace for changed lines or `nil' to disable cleanup.
+   ;; (default nil)
+   dotspacemacs-whitespace-cleanup nil
+   ))
 
-;; remember快捷键
-(global-set-key (kbd "M-<f12>") 'remember)
-
-;; org-agenda日程快捷键
-(global-set-key (kbd "M-<f11>") 'org-agenda)
-
-;; 如果是GUI下,取消退出快捷键
-(if (not(eq window-system 'nil))
-    (global-unset-key (kbd "C-x C-c")))
-
-;; org模式下的自动换行
-;; (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
-(defun rezo-org-capture-tpl-code()
-  (let ((initial (plist-get org-store-link-plist :initial))
-        (annotation (plist-get org-store-link-plist :annotation))
-        (date (format-time-string rezo-const-full-date (current-time)))
-        (now (format-time-string rezo-const-full-datetime (current-time))))
-
-    (concat "* [" date "] %^{keywords, cause or purpose} \t%^g\n"
-            (if (and initial (> (length initial) 0))
-                (concat 
-                 "** From: " annotation "\n"
-                 "** Code Reference: \n"
-                 "#+NAME: %^{usage}\n"
-                 "# key: src\n# expand-env: ((yas/indent-line 'fixed) (yas/wrap-around-region 'nil))\n"
-                 "# --\n"
-                 "#+BEGIN_SRC %^{language}\n"
-                 initial
-                 "\n#+END_SRC\n"))
-            "** [" now "] Comments: \n%?" )))
+(defun dotspacemacs/user-init ()
+  "Initialization function for user code.
+It is called immediately after `dotspacemacs/init', before layer configuration
+executes.
+ This function is mostly useful for variables that need to be set
+before packages are loaded. If you are unsure, you should try in setting them in
+`dotspacemacs/user-config' first."
+  ;; For Flyspell and Ispell
+  (ispell-change-dictionary "american" t)
+  (cond
+   ((executable-find "hunspell")
+    (setq ispell-program-name (executable-find "hunspell"))
+    (setq ispell-local-dictionary "en_US")
+    (setq ispell-local-dictionary-alist
+          '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
+            )))
+   ((executable-find "aspell")
+    (setq ispell-program-name "aspell")
+    (setq ispell-extra-args '("--sug-mode=ultra" "--lang=en_US"))))
 
 
-(defun rezo-org-capture-tpl-other()
-  (let ((initial (plist-get org-store-link-plist :initial))
-        (annotation (plist-get org-store-link-plist :annotation))
-        (date (format-time-string rezo-const-full-date (current-time)))
-        (now (format-time-string rezo-const-full-datetime (current-time))))
+  )
 
-    (concat "* [" date "] %^{keywords, cause or purpose}\t%^g\n"
-            (if (and initial (> (length initial) 0))
-                (concat 
-                 "** From: " annotation "\n"
-                 "** Reference: \n"
-                 "#+BEGIN_QUOTE\n"
-                 initial
-                 "\n#+END_QUOTE\n"))
-            "** [" now "] Comments: \n%?" )))
+(defun dotspacemacs/user-config ()
+  "Configuration function for user code.
+This function is called at the very end of Spacemacs initialization after
+layers configuration.
+This is the place where most of your configurations should be done. Unless it is
+explicitly specified that a variable should be set before a package is loaded,
+you should place your code here."
 
+  ;; 配置快捷键记录
+  (setq keyfreq-excluded-commands
+        '(self-insert-command
+          abort-recursive-edit
+          forward-char
+          backward-char
+          previous-line
+          next-line))
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1)
 
-(defun rezo-org-capture-tpl-idea()
-  (let ((initial (plist-get org-store-link-plist :initial))
-        (annotation (plist-get org-store-link-plist :annotation))
-        (date (format-time-string rezo-const-full-date (current-time)))
-        (now (format-time-string rezo-const-full-datetime (current-time))))
-    (concat "* %^{todo sequence|MAYBE|WAITTING|TODO} [" date "] %^{keywords, cause or purpose} \t%^g\n"
-            "  SCHEDULED:%^t \t DEADLINE:%^t\n"
-            (if (and initial (> (length initial) 0))
-                (concat 
-                 "** From: " annotation "\n"
-                 "** Reference: \n"
-                 "#+BEGIN_QUOTE\n"
-                 initial
-                 "\n#+END_QUOTE\n"))
-            "** Risk,Questions & Review: \n"
-            "** Commemts: \n%?")))
-
-
-(defun rezo-org-capture-tpl-question()
-  (let ((initial (plist-get org-store-link-plist :initial))
-        (annotation (plist-get org-store-link-plist :annotation))
-        (date (format-time-string rezo-const-full-date (current-time)))
-        (now (format-time-string rezo-const-full-datetime (current-time))))
-    (concat "* [" date "] %?? \t%^g\n"
-            (if (and initial (> (length initial) 0))
-                (concat 
-                 "** From: " annotation "\n"
-                 "** Reference: \n"
-                 "#+BEGIN_QUOTE\n"
-                 initial
-                 "\n#+END_QUOTE\n"))
-            "** Target, Scope & Cost: \n")))
-
-
-(defun rezo-org-capture-tpl-task()
-  (let ((initial (plist-get org-store-link-plist :initial))
-        (annotation (plist-get org-store-link-plist :annotation))
-        (date (format-time-string rezo-const-full-date (current-time)))
-        (now (format-time-string rezo-const-full-datetime (current-time))))
-    (concat "* %^{todo sequence|TODO|WAITTING|MAYBE} %^{Priority|[#B]|[#A]|[#C]|} [" date "] %?\t%^g\n"
-            "  SCHEDULED:%^t \t DEADLINE:%^t\n"
-            (if (and initial (> (length initial) 0))
-                (concat 
-                 "** From: " annotation "\n"
-                 "** Reference: \n"
-                 "#+BEGIN_QUOTE\n"
-                 initial
-                 "\n#+END_QUOTE\n"))
-            "** Requirement: \n"
-            "** Daily Report: \n"
-            "** Risk: \n"
-            "** Questions: \n"
-            "** Review: \n")))
-
-;; 定义org-agenda读取的文件
-(setq org-agenda-files (list rezo-gdt-idea
-                             rezo-gdt-task))
-
+;; Do not write anything past this comment. This is where Emacs will
+;; auto-generate custom variable definitions.
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-todo-keywords
-   (quote
-    ((sequence "MAYBE(m!)" "TODO(t@/!)" "PROCESSED(p@/!)" "WAITTING(w@/!)" "|" "DONE(d@/!)" "ABORT(a@/!)"))))
- '(browse-url-browser-function (quote eww-browse-url))
- '(ansi-color-names-vector
-   ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
- '(custom-safe-themes
-   (quote
-    ("357d5abe6f693f2875bb3113f5c031b7031f21717e8078f90d9d9bc3a14bcbd8" "c1390663960169cd92f58aad44ba3253227d8f715c026438303c09b9fb66cdfb" "b571f92c9bfaf4a28cb64ae4b4cdbda95241cd62cf07d942be44dc8f46c491f4" default)))
- '(evil-want-Y-yank-to-eol nil)
- '(org-capture-templates
-   (quote
-    (("c" "Code" plain
-      (file rezo-gdt-code "Code")
-      "%(rezo-org-capture-tpl-code)")
-     ("i" "Idea" entry
-      (file rezo-gdt-idea "Idea")
-      "%(rezo-org-capture-tpl-idea)")
-     ("n" "Note" entry
-      (file rezo-gdt-note "Note")
-      "%(rezo-org-capture-tpl-other)")
-     ("o" "Other" entry
-      (file rezo-gdt-other "Other")
-      "%(rezo-org-capture-tpl-other)")
-     ("Q" "Question" entry
-      (file rezo-gdt-question "Question")
-      "%(rezo-org-capture-tpl-question)")
-     ("t" "Task" entry
-      (file rezo-gdt-task "Task")
-      "%(rezo-org-capture-tpl-task)"))))
  '(package-selected-packages
    (quote
-    (ivy powerline pcre2el spinner alert log4e gntp markdown-mode skewer-mode simple-httpd json-snatcher json-reformat multiple-cursors js2-mode hydra parent-mode projectile pkg-info epl request haml-mode gitignore-mode flx magit magit-popup git-commit with-editor smartparens iedit anzu evil goto-chg undo-tree highlight f php-mode diminish web-completion-data s dash-functional tern dash company inf-ruby bind-map bind-key yasnippet helm avy helm-core async auto-complete popup org-capture-pop-frame winum fuzzy zen-and-art-theme twilight-bright-theme tangotango-theme espresso-theme macrostep elisp-slime-nav auto-compile packed xterm-color ws-butler window-numbering which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package toc-org tagedit swiper sql-indent spacemacs-theme spaceline smeargle slim-mode shell-pop scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rake rainbow-mode rainbow-delimiters quelpa pug-mode popwin phpunit phpcbf php-extras php-auto-yasnippets persp-mode paradox orgit org-projectile org-present org-pomodoro org-plus-contrib org-download org-bullets open-junk-file neotree multi-term move-text molokai-theme mmm-mode minitest markdown-toc magit-gitflow lua-mode lorem-ipsum livid-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc insert-shebang info+ indent-guide ido-vertical-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md flx-ido fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emmet-mode dumb-jump drupal-mode disaster define-word company-web company-tern company-statistics company-shell company-c-headers command-log-mode column-enforce-mode coffee-mode cmake-mode clean-aindent-mode clang-format chruby bundler auto-yasnippet auto-highlight-symbol aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell)))
- '(trash-directory "~/Trash"))
+    (smex molokai-theme-theme wgrep tiny keyfreq js3-mode zen-and-art-theme xterm-color ws-butler winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package twilight-bright-theme toc-org tangotango-theme tagedit swiper sql-indent spaceline smeargle slim-mode shell-pop scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rake rainbow-mode rainbow-delimiters pug-mode popwin phpunit phpcbf php-extras php-auto-yasnippets persp-mode paradox orgit org-projectile org-present org-pomodoro org-download org-bullets open-junk-file neotree multi-term move-text molokai-theme mmm-mode minitest markdown-toc magit-gitflow macrostep lua-mode lorem-ipsum livid-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc insert-shebang info+ indent-guide hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flx-ido fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav dumb-jump drupal-mode disaster diminish define-word company-web company-tern company-statistics company-shell company-c-headers command-log-mode column-enforce-mode coffee-mode cmake-mode clean-aindent-mode clang-format chruby bundler auto-yasnippet auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:background "#1B1D1E" :foreground "#F8F8F2")))))
