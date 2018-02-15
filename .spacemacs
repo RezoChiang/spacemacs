@@ -405,6 +405,7 @@ you should place your code here."
           next-line))
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1)
+  )
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -413,6 +414,15 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(delete-by-moving-to-trash t)
+ '(trash-directory "~/Trash")
+ '(js2-indent-level 4)
+ '(js3-indent-level 4)
+ '(lua-indent-level 4)
+
+ '(org-todo-keywords
+   (quote
+    ((sequence "MAYBE(m!)" "TODO(t@/!)" "PROCESSED(p@/!)" "WAITTING(w@/!)" "|" "DONE(d@/!)" "ABORT(a@/!)"))))
  '(package-selected-packages
    (quote
     (smex molokai-theme-theme wgrep tiny keyfreq js3-mode zen-and-art-theme xterm-color ws-butler winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package twilight-bright-theme toc-org tangotango-theme tagedit swiper sql-indent spaceline smeargle slim-mode shell-pop scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rake rainbow-mode rainbow-delimiters pug-mode popwin phpunit phpcbf php-extras php-auto-yasnippets persp-mode paradox orgit org-projectile org-present org-pomodoro org-download org-bullets open-junk-file neotree multi-term move-text molokai-theme mmm-mode minitest markdown-toc magit-gitflow macrostep lua-mode lorem-ipsum livid-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc insert-shebang info+ indent-guide hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt help-fns+ helm-themes helm-swoop helm-projectile helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link gh-md fuzzy flx-ido fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav dumb-jump drupal-mode disaster diminish define-word company-web company-tern company-statistics company-shell company-c-headers command-log-mode column-enforce-mode coffee-mode cmake-mode clean-aindent-mode clang-format chruby bundler auto-yasnippet auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line ac-ispell))))
